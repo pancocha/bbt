@@ -1,4 +1,13 @@
 <?php
+/*!
+    Buy-By-Touch catalogue generator
+
+    Products are retrieved using PrestaShop Web Services API.
+    Edit config.php and run from console then. 
+    Output is written to catalogue.xml
+
+    Author: Ondrej Pancocha <o.pancocha@centrum.cz>
+*/
 
 define('DEBUG', true);
 define('TRACE', true);
@@ -432,7 +441,6 @@ function addCItem($out, $ws, $p, $langId)
     } while ($hasComb && ($i < count($combArray)));
 }
 
-//xdebug_start_trace('/tmp/catalogue.log');
 try
 {
 
@@ -491,5 +499,4 @@ catch ( Exception $ex )
 	ob_end_clean();
 	header('HTTP/1.1 500 Internal Server Error', true, 500);
 }
-//xdebug_stop_trace();
 ?>
