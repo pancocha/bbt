@@ -421,7 +421,8 @@ function addCItem($out, $ws, $p, $langId)
         $pkg->addAttribute('id',$reference);
         $pkg->addAttribute('count',1);
         $pkg->addAttribute('price',round($priceNoVat,3));
-        $pkg->addAttribute('vat',$vatRate);
+        // output VAT rate as float (not percents) e.g. 0.21
+        $pkg->addAttribute('vat',$vatRate/100);
 
         // add all categories of the product
         foreach ($p->product->associations->categories->category as $catId) {
