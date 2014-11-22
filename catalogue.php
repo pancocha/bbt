@@ -84,6 +84,7 @@ class psCategory
     /*! Resolve category */
     public function resolveCategory($id)
     {
+        global $BBC_CAT_IGNORE_RNAMES;
         if (isset($this->categories[$id])) {
             dbg("Category".$id." \"".$this->categories[$id]['rew']."\" is already resolved");
             return true;
@@ -96,11 +97,13 @@ class psCategory
                 dbg("Resolved: ".$id." -> ".$catRName);
                 $this->categories[$id]['rew'] = $catRName;
                 $this->categories[$id]['name'] = $catName;
-                if (!strcmp($this->categories[$id]['rew'], BBC_CATIGNORE_RNAME)) {
-                    dbg('Ignoring category '.BBC_CATIGNORE_RNAME.' ('.$id.')');
+                $this->categories[$id]['ign'] = false;
+                // ignore category?
+                foreach ($BBC_CAT_IGNORE_RNAMES as $cat_ignore_rname) {
+                    if (!strcmp($this->categories[$id]['rew'], $cat_ignore_rname)) {
+                        dbg('Ignoring category '.$cat_ignore_rname.' ('.$id.')');
                     $this->categories[$id]['ign'] = true;
-                } else {
-                    $this->categories[$id]['ign'] = false;
+                    }
                 }
                 return $catRName;
             } else {
@@ -338,7 +341,7 @@ class psCombinationResolver
     Add one catalogue item to the catalogue XML.
     \param out[out]     output SimpleXMLElement
     \param ws[in]       PrestaShopWebservice instance
-    \param item[in]     One product retrieved from the PrestaShop WS API
+    \param p[in]        One product retrieved from the PrestaShop WS API
     \param langId[in]   Id of the language used for descriptions
 */
 function addCItem($out, $ws, $p, $langId)
@@ -349,12 +352,21 @@ function addCItem($out, $ws, $p, $langId)
     global $combRes;
     global $cres;
     global $vat;
+    global $BBC_REF_IGNORE_PATTERNS;
 
     $id=(string)$p->product->id;
     $reference=(string)$p->product->reference;
     if (!(bool)((string)$p->product->active)) {
         dbg("Product ".($p->xpath('description/language[@id=\''.$langId.'\']')[0])." is not active");
         return NULL;
+    }
+    // ignore product?
+    foreach ($BBC_REF_IGNORE_PATTERNS as $ref_ignore_pattern) {
+        if (preg_match("/".$ref_ignore_pattern."/",$reference)) {
+            trc("Ignoring product, because it's refcode '".$reference.
+                "' matches ignore pattern '".$ref_ignore_pattern."'");
+            return NULL;
+        } 
     }
     $manufacturer =(string) $p->product->manufacturer_name;
     $description = strip_tags((string) ($p->xpath('description/language[@id=\''.$langId.'\']')[0]));

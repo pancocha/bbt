@@ -8,5 +8,8 @@ define('PS_ROOT','/');
 define('PS_USER','abc');
 define('PS_PASSWORD','abc');
 define('ID_EMPLOYEE','1');
-define('BBC_CATIGNORE_RNAME','home');       // Rewritten name of category to ignore when building the BBT catalogue
+// Rewritten names of categories to ignore when building the BBT catalogue
+$BBC_CAT_IGNORE_RNAMES = array("home","akceslevy");
+// Regex patterns to match products which are excluded from the BBT catalogue
+$BBC_REF_IGNORE_PATTERNS = array("^SY_.*","^NU_.*");
 ?>
